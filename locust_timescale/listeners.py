@@ -285,7 +285,7 @@ class Timescale:  # pylint: disable=R0902
                     self._run_id,
                     self._testplan,
                     self.env.parsed_options.num_users or 1,
-                    self.env.parsed_options.ips,  # this field is incorrectly called "rps" in db, it should be called something like "target_ips"
+                    0,
                     self.env.parsed_options.description,
                     self.env.parsed_options.test_env,
                     self.env.parsed_options.profile,

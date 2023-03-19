@@ -3,7 +3,7 @@ build:
 	cd locust-grafana && make build
 
 down:
-	locust-compose down -v
+	docker compose down -v
 
 up:
-	locust-compose up
+	docker compose up

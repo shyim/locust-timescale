@@ -1,4 +1,3 @@
-from .wait_time import constant_ips, constant_total_ips
 from .listeners import Timescale
 import locust
 from locust.user.task import DefaultTaskSet, TaskSet
@@ -127,32 +126,6 @@ def add_arguments(parser: LocustArgumentParser):
         env_var="LOCUST_OVERRIDE_PLAN_NAME",
         default="",
     )
-    other = parser.add_argument_group(
-        "locust-plugins - Extras",
-    )
-    # fix for https://github.com/locustio/locust/issues/1085
-    other.add_argument(
-        "-i",
-        "--iterations",
-        type=int,
-        help="Run at most this number of task iterations and terminate once they have finished",
-        env_var="LOCUST_ITERATIONS",
-        default=0,
-    )
-    other.add_argument(
-        "--console-stats-interval",
-        type=int,
-        help="Interval at which to print locust stats to command line",
-        env_var="LOCUST_CONSOLE_STATS_INTERVAL",
-        default=locust.stats.CONSOLE_STATS_INTERVAL_SEC,
-    )
-    other.add_argument(
-        "--ips",
-        type=float,
-        help="Replace all wait_time:s with global iterations-per-second limiter",
-        env_var="LOCUST_IPS",
-        default=0,
-    )
 
 
 _timescale_added = False
@@ -165,44 +138,6 @@ def on_locust_init(environment, **kwargs):
         if not _timescale_added:
             Timescale(env=environment)
             _timescale_added = True
-
-
-@events.test_start.add_listener
-def set_up_iteration_limit(environment: Environment, **kwargs):
-    options = environment.parsed_options
-    locust.stats.CONSOLE_STATS_INTERVAL_SEC = environment.parsed_options.console_stats_interval
-    if options.iterations:
-        runner: Runner = environment.runner
-        runner.iterations_started = 0
-        runner.iteration_target_reached = False
-        logging.debug(f"Iteration limit set to {options.iterations}")
-
-        def iteration_limit_wrapper(method):
-            @wraps(method)
-            def wrapped(self, task):
-                if runner.iterations_started == options.iterations:
-                    if not runner.iteration_target_reached:
-                        runner.iteration_target_reached = True
-                        logging.info(
-                            f"Iteration limit reached ({options.iterations}), stopping Users at the start of their next task run"
-                        )
-                    if runner.user_count == 1:
-                        logging.info("Last user stopped, quitting runner")
-                        runner.quit()
-                    raise StopUser()
-                runner.iterations_started = runner.iterations_started + 1
-                method(self, task)
-
-            return wrapped
-
-        # monkey patch TaskSets to add support for iterations limit. Not ugly at all :)
-        TaskSet.execute_task = iteration_limit_wrapper(TaskSet.execute_task)
-        DefaultTaskSet.execute_task = iteration_limit_wrapper(DefaultTaskSet.execute_task)
-
-    if options.ips:
-        for user_class in environment.runner.user_classes:
-            user_class.wait_time = constant_total_ips(options.ips)
-
 
 @events.quitting.add_listener
 def do_checks(environment, **_kw):

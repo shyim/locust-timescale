@@ -1,9 +1,9 @@
 __pycache__
-locust_plugins.egg-info
+locust_timescale.egg-info
 pip-wheel-metadata
 build
 dist
-locust_plugins.egg-info
+locust_timescale.egg-info
 src
 .eggs
 .metals

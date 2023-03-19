@@ -5,19 +5,19 @@ options:
 
 tasks:
   format:
-    usage: formats the examples/ and locust_plugins/ folders with black
+    usage: formats the examples/ and locust_timescale/ folders with black
     run:
       - command:
           exec: |
-            black locust_plugins/
+            black locust_timescale/
             black examples/
 
   pylint:
-    usage: runs pylint against all files in examples/ and locust_plugins/ folders
+    usage: runs pylint against all files in examples/ and locust_timescale/ folders
     run:
       - command:
           exec: |
-            pylint --rcfile .pylintrc locust_plugins/
+            pylint --rcfile .pylintrc locust_timescale/
             pylint --rcfile .pylintrc examples/*.py
 
   test:
@@ -26,4 +26,3 @@ tasks:
       - command:
           exec: |
             tox -e py39
-
