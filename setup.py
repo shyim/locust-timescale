@@ -41,6 +41,5 @@ setup(
     use_scm_version={
         "write_to": "locust_timescale/_version.py",
         "local_scheme": "no-local-version",
-    },
-    setup_requires=["setuptools_scm"],
+    }
 )
