@@ -34,7 +34,7 @@ setup(
     package_data={"locust_timescale": ["py.typed"]},
     zip_safe=False,
     install_requires=[
-        "locust>=2.14.0",
+        "locust",
         "psycogreen",
         "psycopg2"
     ],
